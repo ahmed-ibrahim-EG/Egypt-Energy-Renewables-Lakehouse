@@ -1,0 +1,67 @@
+services:
+  # 1. Stage 1: Bronze Layer Ingestion
+  bronze:
+    image: jupyter/pyspark-notebook:latest
+    container_name: lakehouse_bronze
+    networks:
+      - lakehouse_net
+    volumes:
+      - ./notebooks:/home/jovyan/notebooks
+      - ./data_lake:/home/jovyan/data_lake
+    command: >
+      jupyter nbconvert --to notebook --execute
+      /home/jovyan/notebooks/01_bronze_ingestion.ipynb
+      --output /home/jovyan/data_lake/01_bronze_out.ipynb
+
+  # 2. Stage 2: Silver Layer (waits until Bronze finishes successfully)
+  silver:
+    image: jupyter/pyspark-notebook:latest
+    container_name: lakehouse_silver
+    depends_on:
+      bronze:
+        condition: service_completed_successfully
+    networks:
+      - lakehouse_net
+    volumes:
+      - ./notebooks:/home/jovyan/notebooks
+      - ./data_lake:/home/jovyan/data_lake
+    command: >
+      jupyter nbconvert --to notebook --execute
+      /home/jovyan/notebooks/02_silver_transformation.ipynb
+      --output /home/jovyan/data_lake/02_silver_out.ipynb
+
+  # 3. Stage 3: Gold Layer (waits until Silver finishes successfully)
+  gold:
+    image: jupyter/pyspark-notebook:latest
+    container_name: lakehouse_gold
+    depends_on:
+      silver:
+        condition: service_completed_successfully
+    networks:
+      - lakehouse_net
+    volumes:
+      - ./notebooks:/home/jovyan/notebooks
+      - ./data_lake:/home/jovyan/data_lake
+    command: >
+      jupyter nbconvert --to notebook --execute
+      /home/jovyan/notebooks/03_gold_star_schema.ipynb
+      --output /home/jovyan/data_lake/03_gold_out.ipynb
+
+  # 4. Automated Scheduler (Runs the full pipeline on a monthly Cron schedule)
+  scheduler:
+    image: mcuadros/ofelia:latest
+    container_name: lakehouse_scheduler
+    restart: unless-stopped
+    depends_on:
+      - gold
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      # Runs on the 1st of every month at 02:00 AM
+      ofelia.job-local.run-pipeline.schedule: "0 0 2 1 * *"
+      ofelia.job-local.run-pipeline.command: "docker start -a lakehouse_bronze && docker start -a lakehouse_silver && docker start -a lakehouse_gold"
+
+networks:
+  lakehouse_net:
+    driver: bridge

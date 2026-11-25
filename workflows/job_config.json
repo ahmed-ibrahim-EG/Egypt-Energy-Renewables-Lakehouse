@@ -1,0 +1,51 @@
+{
+    "name": "Egypt_Energy_Lakehouse_Pipeline",
+    "schedule": {
+        "quartz_cron_expression": "0 0 2 1 * ?",
+        "timezone_id": "Africa/Cairo",
+        "pause_status": "UNPAUSED"
+    },
+    "timeout_seconds": 1800,
+    "max_concurrent_runs": 1,
+    "email_notifications": {
+        "on_failure": [
+            "team-alerts@example.com"
+        ]
+    },
+    "tasks": [
+        {
+            "task_key": "01_bronze_ingestion",
+            "description": "Ingest raw data from EIA API, World Bank API, and IRENA into Bronze Delta tables.",
+            "notebook_task": {
+                "notebook_path": "/Workspace/Shared/egypt-energy-lakehouse/Bronze",
+                "source": "WORKSPACE"
+            }
+        },
+        {
+            "task_key": "02_silver_transformation",
+            "description": "Standardize schemas, deduplicate, and apply Data Quality & Quarantine rules.",
+            "depends_on": [
+                {
+                    "task_key": "01_bronze_ingestion"
+                }
+            ],
+            "notebook_task": {
+                "notebook_path": "/Workspace/Shared/egypt-energy-lakehouse/Silver",
+                "source": "WORKSPACE"
+            }
+        },
+        {
+            "task_key": "03_gold_star_schema",
+            "description": "Build Kimball Star Schema (3 Facts, 7 Dimensions) and Annual KPI View in workspace.gold.",
+            "depends_on": [
+                {
+                    "task_key": "02_silver_transformation"
+                }
+            ],
+            "notebook_task": {
+                "notebook_path": "/Workspace/Shared/egypt-energy-lakehouse/Gold",
+                "source": "WORKSPACE"
+            }
+        }
+    ]
+}
