@@ -138,7 +138,12 @@ egypt-energy-renewables-lakehouse/
 
 ---
 
-## 👥 Project Attribution & Evolution
+## 👨‍💻 Author & Project Evolution
 
-* **Initial Foundation (Bronze & Silver Layers):** Originally initiated with my project teammates (**Marchelino** & **George**), who built the initial raw ingestion and Silver transformation stages.
-* **End-to-End Completion & Enhancement (Current Version):** Completed, refactored, and extended by **Ahmed** to its current production-ready state—including the **Gold Star Schema**, **Unity Catalog PK/FK governance**, **Databricks Workflows orchestration & monthly scheduling**, **Executive AI/BI Dashboard**, and the **Docker Compose + Ofelia** containerized local pipeline.
+* **Initial Team Foundation:** The initial concept and early pipeline stages were originally started as a collaborative team project with my peers.
+* **Full Refactoring, Restructuring & Current Version:** Completely refactored, redesigned, and extended end-to-end by **Ahmed Ibrahim**—restructuring the entire repository, standardizing the Medallion pipeline, implementing the **Gold Star Schema** with **Unity Catalog PK/FK governance**, automating execution via **Databricks Workflows**, building the **Executive AI/BI Dashboard**, and adding a containerized **Docker Compose + Ofelia** local pipeline.
+
+**Connect with me:**
+* **GitHub:** [ahmed-ibrahim-EG](https://github.com/ahmed-ibrahim-EG)
+* **LinkedIn:** [Ahmed Ibrahim](https://www.linkedin.com/in/ahmed-ibrahim-36600b2a5)
+* **Portfolio:** [ahmed-ibrahim-eg.github.io](https://ahmed-ibrahim-eg.github.io/)
